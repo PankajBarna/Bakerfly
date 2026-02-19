@@ -9,32 +9,46 @@ import publicRoutes from "./routes/public.js";
 import adminRoutes from "./routes/admin.js";
 import { notFound, errorHandler } from "./middleware/error.js";
 
-
-
 const app = express();
 
-// import cors from "cors";
-
-const allowedOrigins = [
+/**
+ * ✅ CORS (single, clean config)
+ * Add your Netlify production + preview URLs here (NO trailing slash).
+ */
+const allowedOrigins = new Set([
   "http://localhost:5173",
   "http://localhost:3000",
-  "https://astounding-gelato-856f18.netlify.app/"
-];
+  // Netlify (production)
+  "https://astounding-gelato-856f18.netlify.app",
+  // Netlify (deploy preview – optional)
+  "https://699692f02527f46c5b730425--astounding-gelato-856f18.netlify.app",
+]);
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like curl/postman)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error("CORS blocked: " + origin));
-  },
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      // Allow requests with no origin (curl, server-to-server, health checks)
+      if (!origin) return cb(null, true);
 
+      if (allowedOrigins.has(origin)) return cb(null, true);
 
+      return cb(new Error(`CORS blocked: ${origin}`));
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// Handle preflight requests
 app.options("*", cors());
 
+app.use(helmet());
+app.use(express.json({ limit: "1mb" }));
+app.use(morgan("dev"));
+
+/**
+ * Debug endpoint (optional)
+ */
 app.get("/db-status", (req, res) => {
   res.json({
     readyState: mongoose.connection.readyState,
@@ -42,33 +56,21 @@ app.get("/db-status", (req, res) => {
       0: "disconnected",
       1: "connected",
       2: "connecting",
-      3: "disconnecting"
-    }
+      3: "disconnecting",
+    },
   });
 });
 
-import cors from "cors";
-
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://699692f02527f46c5b730425--astounding-gelato-856f18.netlify.app"
-  ]
-}));
-
-
-app.use(helmet());
-app.use(cors({ origin: true, credentials: true }));
-app.use(express.json({ limit: "1mb" }));
-app.use(morgan("dev"));
-
 app.get("/health", (req, res) => res.json({ ok: true }));
 
+// Routes
 app.use("/api", publicRoutes);
 app.use("/api/admin", adminRoutes);
 
+// Errors
 app.use(notFound);
 app.use(errorHandler);
 
+// Start
 await connectDB();
-app.listen(env.PORT, () => console.log(`✅ Server running on http://localhost:${env.PORT}`));
+app.listen(env.PORT, () => console.log(`✅ Server running on port ${env.PORT}`));
