@@ -33,7 +33,7 @@ export async function apiPut(path, body) {
   return res.json();
 }
 
-export async function apiDelete(path) {
+async function apiDelete(path) {
   const res = await fetch(`${API_BASE}${path}`, {
     method: "DELETE",
     headers: { ...authHeaders() },
@@ -41,3 +41,15 @@ export async function apiDelete(path) {
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
+
+export const apiDel = apiDelete
+
+// export async function apiDel(path) {
+//   const res = await fetch(`${API_BASE}${path}`, {
+//     method: "DELETE",
+//     headers: { ...authHeaders() },
+//   });
+//   if (!res.ok) throw new Error(await res.text());
+//   return res.json();
+// }
+

@@ -25,12 +25,15 @@ app.get("/db-status", (req, res) => {
   });
 });
 
+import cors from "cors";
+
 app.use(cors({
   origin: [
     "http://localhost:5173",
     "https://699692f02527f46c5b730425--astounding-gelato-856f18.netlify.app"
   ]
-}))
+}));
+
 
 app.use(helmet());
 app.use(cors({ origin: true, credentials: true }));
