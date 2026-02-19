@@ -13,6 +13,28 @@ import { notFound, errorHandler } from "./middleware/error.js";
 
 const app = express();
 
+import cors from "cors";
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://astounding-gelato-856f18.netlify.app/"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like curl/postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("CORS blocked: " + origin));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+
+app.options("*", cors());
+
 app.get("/db-status", (req, res) => {
   res.json({
     readyState: mongoose.connection.readyState,
