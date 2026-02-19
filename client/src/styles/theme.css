@@ -1,0 +1,14 @@
+:root{
+  --bg: #fbf7f2;          /* warm off-white */
+  --surface: #ffffff;
+  --text: #2a1f1a;        /* cocoa */
+  --muted: #6b5a52;
+  --brand: #b88a7a;       /* rose-gold */
+  --brand2: #e7c3a4;      /* warm highlight */
+  --border: rgba(42,31,26,0.10);
+  --shadow: 0 12px 30px rgba(42,31,26,0.10);
+
+  --ring: rgba(184,138,122,0.45);
+  --cardGrad: radial-gradient(1000px 600px at 10% -10%, rgba(231,195,164,0.35), transparent 60%),
+              radial-gradient(900px 500px at 120% 0%, rgba(184,138,122,0.22), transparent 55%);
+}
